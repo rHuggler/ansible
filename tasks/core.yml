@@ -1,0 +1,34 @@
+- name: Install core packages
+  apt:
+    name: ["i3", "htop", "pavucontrol", "pipewire", "wireplumber", "pipewire-pulse"]
+    state: latest
+  become: true
+  tags:
+    - core
+
+- name: Disable pulseaudio
+  ansible.builtin.systemd:
+    name: ["pulseaudio.service", "pulseaudio.socket"]
+    enabled: false
+  tags:
+    - core
+
+- name: Mask pulseaudio
+  ansible.builtin.systemd:
+    name: pulseaudio
+    masked: true
+  tags:
+    - core
+
+- name: Enable pipewire
+  ansible.builtin.systemd:
+    name: ["pipewire", "pipewire-pulse", "wireplumber"]
+    enabled: true
+  tags:
+    - core
+
+- name: Disable power saving in kernel
+  shell: 'sudo tee /etc/modprobe.d/snd-hda-intel.conf <<< "options snd_hda_intel power_save=0"'
+  tags:
+    - core
+
