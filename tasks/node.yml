@@ -4,6 +4,12 @@
   become: true
   tags:
     - node
+
+- name: Set npm prefix
+  shell: "npm config set prefix {{ lookup('env', 'HOME') }}/.npm"
+  tags:
+    - node
+
 - name: Install Node v14
   shell: npx n 14
   environment:
