@@ -1,0 +1,14 @@
+- hosts: localhost
+  pre_tasks:
+    - name: Update apt repositories
+      apt:
+        update_cache: true
+      become: true
+      tags:
+        - zsh
+        - node
+  tasks:
+    - import_tasks: tasks/zsh.yml
+    - import_tasks: tasks/node.yml
+    - import_tasks: tasks/docker.yml
+      become: true

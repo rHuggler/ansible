@@ -1,0 +1,99 @@
+- name: Create keyring
+  shell: install -m 0755 -d /etc/apt/keyrings
+  tags:
+    - docker
+
+- name: Check if docker.gpg is installed
+  stat:
+    path: /etc/apt/keyrings/docker.gpg
+  register: dockergpg
+  tags:
+    - docker
+
+- name: Add Docker GPG Key to keyring
+  shell: curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+  when: 'dockergpg.stat.exists == False'
+  tags:
+    - docker
+
+- name: Set permissions
+  ansible.builtin.file:
+    path: /etc/apt/keyrings/docker.gpg
+    mode: a+r
+  tags:
+    - docker
+
+- name: Add Docker Repository
+  shell: 'echo "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null'
+  tags:
+    - docker
+
+- name: Remove old versions
+  apt:
+    name: "{{ item }}"
+    state: absent
+  with_items:
+    - docker.io
+    - docker-doc 
+    - docker-compose 
+    - podman-docker 
+    - containerd 
+    - runc
+  tags:
+    - docker
+
+- name: Install dependencies
+  apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: true
+  with_items:
+    - ca-certificates
+    - curl
+    - gnupg
+  tags:
+    - docker
+
+- name: Install Docker
+  apt:
+    name: "{{ item }}"
+    state: latest
+    update_cache: true
+  with_items:
+    - docker-ce
+    - docker-ce-cli
+    - containerd.io
+    - docker-buildx-plugin
+    - docker-compose-plugin
+  tags:
+    - docker
+
+- name: Create docker group
+  ansible.builtin.group:
+    name: docker
+    state: present
+  tags:
+    - docker
+
+- name: Add user to group
+  ansible.builtin.user:
+    name: "{{ ansible_user_id }}"
+    groups: ['docker']
+    append: true
+  tags:
+    - docker
+
+- name: Start docker on boot
+  ansible.builtin.systemd:
+    name: docker
+    enabled: true
+  tags:
+    - docker
+
+- name: Start containerd on boot
+  ansible.builtin.systemd:
+    name: containerd
+    enabled: true
+  tags:
+    - docker
+

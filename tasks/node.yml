@@ -1,0 +1,13 @@
+- name: Install Node
+  apt:
+    name: ['nodejs', 'npm']
+  become: true
+  tags:
+    - node
+- name: Install Node v14
+  shell: npx n 14
+  environment:
+    N_PREFIX: "{{ lookup('env', 'HOME') }}/.n"
+  tags:
+    - node
+

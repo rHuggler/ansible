@@ -1,0 +1,76 @@
+- name: Install zsh
+  apt:
+    name: zsh
+    state: latest
+  become: true
+  tags:
+    - zsh
+
+- name: Change shell
+  shell: "chsh {{ ansible_user_id }} -s $(which zsh)"
+  become: true
+  tags:
+    - zsh
+
+- name: Check if zshrc exists
+  stat:
+    path: "{{ lookup('env', 'HOME') }}/.zshrc"
+  register: zshrc
+  tags:
+    - zsh
+
+- name: Copies default zshrc file
+  ansible.builtin.copy:
+    src: /etc/zsh/zshrc
+    dest: "{{ lookup('env', 'HOME') }}/.zshrc"
+    owner: "{{ ansible_user_id }}"
+    group: "{{ ansible_user_id }}"
+  when: zshrc.stat.exists == False
+
+- name: Check if oh-my-zsh is installed
+  stat:
+    path: "{{ lookup('env', 'HOME') }}/.oh-my-zsh"
+  register: oh_my_zsh
+  tags:
+    - zsh
+
+- name: Install oh-my-zsh
+  shell: curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh | sh
+  when: oh_my_zsh.stat.exists == False
+  tags:
+    - zsh
+
+- name: Install the zsh autosuggestions plugin
+  ansible.builtin.git:
+    repo: https://github.com/zsh-users/zsh-autosuggestions
+    dest: "{{ lookup('env', 'HOME') }}/.oh-my-zsh/custom/plugins/zsh-autosuggestions"
+  tags:
+    - zsh
+
+- name: Check if zsh-autosuggestions is in zshrc
+  ansible.builtin.lineinfile:
+    path: "{{ lookup('env', 'HOME') }}/.zshrc"
+    regexp: '^plugins=\((.*zsh-autosuggestions.*)\)$'
+    state: absent
+  check_mode: true
+  changed_when: false
+  register: zsh_autosuggestions
+  tags:
+    - zsh
+
+- name: Add autosuggestions plugin to zshrc
+  ansible.builtin.lineinfile:
+    path: "{{ lookup('env', 'HOME') }}/.zshrc"
+    regexp: '^plugins=\((.*)\)$'
+    line: 'plugins=(\1 zsh-autosuggestions)'
+    backrefs: true
+  when: zsh_autosuggestions.found == 0
+  tags:
+    - zsh
+
+- name: Install xterm
+  apt:
+    name: xterm
+    state: latest
+  become: true
+
