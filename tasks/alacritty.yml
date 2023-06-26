@@ -1,0 +1,171 @@
+- name: Clone alacritty repo
+  ansible.builtin.git:
+    repo: 'https://github.com/alacritty/alacritty.git'
+    dest: "{{ lookup('env', 'HOME') }}/alacritty"
+  tags:
+    - alacritty
+
+- name: Install Rust
+  shell: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+  tags:
+    - alacritty
+    - rust
+
+- name: Make sure compiler version is at stable
+  shell: rustup override set stable && rustup update stable
+  environment:
+    PATH: "{{ lookup('env', 'HOME') }}/.cargo/bin:{{ lookup('env', 'PATH') }}"
+  tags:
+    - alacritty
+    - rust
+
+- name: Install build dependencies
+  apt:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - cmake 
+    - pkg-config 
+    - libfreetype6-dev 
+    - libfontconfig1-dev 
+    - libxcb-xfixes0-dev 
+    - libxkbcommon-dev 
+    - python3
+    - gzip
+    - scdoc
+  become: true
+  tags:
+    - alacritty
+    - rust
+
+- name: Build alacritty
+  shell: 
+    cmd: cargo build --release
+    chdir: "{{ lookup('env', 'HOME') }}/alacritty"
+  environment:
+    PATH: "{{ lookup('env', 'HOME') }}/.cargo/bin:{{ lookup('env', 'PATH') }}"
+  tags:
+    - alacritty
+
+- name: Create ~/.local/bin if not exists
+  file:
+    path: "{{ lookup('env', 'HOME') }}/.local/bin/"
+    state: directory
+  tags:
+    - alacritty
+
+- name: Move binary to local directory in PATH
+  ansible.builtin.copy:
+    src: "{{ lookup('env', 'HOME') }}/alacritty/target/release/alacritty"
+    dest: "{{ lookup('env', 'HOME') }}/.local/bin/alacritty"
+  tags:
+    - alacritty
+
+- name: Check if terminfo is installed
+  shell: infocmp alacritty
+  register: terminfo
+  ignore_errors: true
+  tags:
+    - alacritty
+
+- name: Install alacritty terminfo
+  shell: 
+    cmd: tic -xe alacritty,alacritty-direct extra/alacritty.info
+    chdir: "{{ lookup('env', 'HOME') }}/alacritty"
+  become: true
+  when: "'open terminfo file' in terminfo.stderr"
+  tags:
+    - alacritty
+
+- name: Check if desktop entry exists
+  stat:
+    path: /usr/share/applications/Alacritty.desktop
+  register: desktop
+  tags:
+    - alacritty
+
+- name: Copy icon
+  ansible.builtin.copy:
+    src: "{{ lookup('env', 'HOME') }}/alacritty/extra/logo/alacritty-term.svg"
+    dest: /usr/share/pixmaps/Alacritty.svg
+  become: true
+  when: desktop.stat.exists == False
+  tags:
+    - alacritty
+
+- name: Create desktop entry
+  shell:
+    cmd: "{{ item }}"
+    chdir: "{{ lookup('env', 'HOME') }}/alacritty"
+  with_items:
+    - desktop-file-install extra/linux/Alacritty.desktop
+    - update-desktop-database
+  become: true
+  when: desktop.stat.exists == False
+  tags:
+    - alacritty
+
+- name: Check if alacritty completions is in zshrc
+  ansible.builtin.lineinfile:
+    path: "{{ lookup('env', 'HOME') }}/.zshrc"
+    regexp: '\.zsh_functions'
+    state: absent
+  check_mode: true
+  changed_when: false
+  register: alacritty_completions_zshrc
+  tags:
+    - alacritty
+
+- name: Add alacritty completions to zshrc
+  ansible.builtin.lineinfile:
+    path: "{{ lookup('env', 'HOME') }}/.zshrc"
+    line: "fpath+={{ lookup('env', 'HOME') }}/.zsh_functions"
+  when: alacritty_completions_zshrc.found == 0
+  tags:
+    - alacritty
+
+- name: Check if alacritty completions file exists
+  stat:
+    path: "{{ lookup('env', 'HOME') }}/.zsh_functions/_alacritty"
+  register: alacritty_completions
+  tags:
+    - alacritty
+
+- name: Create ~/.zsh_functions if not exists
+  file:
+    path: "{{ lookup('env', 'HOME') }}/.zsh_functions"
+    state: directory
+  tags:
+    - alacritty
+
+- name: Copy completions
+  ansible.builtin.copy:
+    src: "{{ lookup('env', 'HOME') }}/alacritty/extra/completions/_alacritty"
+    dest: "{{ lookup('env', 'HOME') }}/.zsh_functions/_alacritty"
+  when: alacritty_completions.stat.exists == False
+  tags:
+    - alacritty
+
+- name: Check if man files exists
+  shell: man alacritty
+  register: man
+  ignore_errors: true
+  tags:
+    - alacritty
+  
+- name: Install manual pages
+  shell:
+    cmd: "{{ item }}"
+    chdir: "{{ lookup('env', 'HOME') }}/alacritty"
+  become: true
+  with_items:
+    - mkdir -p /usr/local/share/man/man1
+    - mkdir -p /usr/local/share/man/man5
+    - scdoc < extra/man/alacritty.1.scd | gzip -c | tee /usr/local/share/man/man1/alacritty.1.gz > /dev/null
+    - scdoc < extra/man/alacritty-msg.1.scd | gzip -c | tee /usr/local/share/man/man1/alacritty-msg.1.gz > /dev/null
+    - scdoc < extra/man/alacritty.5.scd | gzip -c | tee /usr/local/share/man/man5/alacritty.5.gz > /dev/null
+    - scdoc < extra/man/alacritty-bindings.5.scd | gzip -c | tee /usr/local/share/man/man5/alacritty-bindings.5.gz > /dev/null
+  when: "'No manual entry' in man.stderr"
+  tags:
+    - alacritty
+

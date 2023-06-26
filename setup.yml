@@ -8,10 +8,12 @@
         - zsh
         - node
         - core
+        - alacritty
   tasks:
     - import_tasks: tasks/zsh.yml
     - import_tasks: tasks/core.yml
     - import_tasks: tasks/node.yml
+    - import_tasks: tasks/alacritty.yml
     - import_tasks: tasks/docker.yml
       become: true
     - import_tasks: tasks/spotify.yml
