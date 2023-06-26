@@ -40,3 +40,9 @@
   tags:
     - core
 
+- name: Disable fn lock
+  shell: echo 2 | tee /sys/module/hid_apple/parameters/fnmode
+  become: true
+  tags:
+    - core
+
