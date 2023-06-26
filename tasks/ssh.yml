@@ -1,0 +1,33 @@
+- name: Ensure ~/.ssh directory exists
+  file:
+    dest: "{{ lookup('env', 'HOME') }}/.ssh"
+    mode: 0700
+    state: directory
+  tags:
+    - dotfiles
+    - ssh
+
+- name: Install ssh key
+  copy:
+    src: "{{ playbook_dir }}/../.ssh/{{ item }}"
+    dest: "{{ lookup('env', 'HOME') }}/.ssh/{{ item }}"
+    mode: 0600
+  with_items:
+    - github_rhuggler
+    - github_rhuggler-cr
+  tags:
+    - dotfiles
+    - ssh
+
+- name: Install public ssh key
+  copy:
+    src: "{{ playbook_dir }}/../.ssh/{{ item }}.pub"
+    dest: "{{ lookup('env', 'HOME') }}/.ssh/{{ item }}.pub"
+    mode: 0644
+  with_items:
+    - github_rhuggler
+    - github_rhuggler-cr
+  tags:
+    - dotfiles
+    - ssh
+
