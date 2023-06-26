@@ -34,7 +34,7 @@
 
 - name: Install more packages
   apt:
-    name: ["rofi", "playerctl", "tree", "picom"]
+    name: ["rofi", "playerctl", "tree", "picom", "stow", "keychain"]
     state: latest
   become: true
   tags:

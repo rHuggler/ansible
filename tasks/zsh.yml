@@ -68,3 +68,24 @@
   tags:
     - zsh
 
+- name: Check if keychain is in zshrc
+  ansible.builtin.lineinfile:
+    path: "{{ lookup('env', 'HOME') }}/.zshrc"
+    regexp: '^plugins=\((.*keychain.*)\)$'
+    state: absent
+  check_mode: true
+  changed_when: false
+  register: keychain
+  tags:
+    - zsh
+
+- name: Add keychain and gpg-agent plugins to zshrc
+  ansible.builtin.lineinfile:
+    path: "{{ lookup('env', 'HOME') }}/.zshrc"
+    regexp: '^plugins=\((.*)\)$'
+    line: 'plugins=(\1 keychain gpg-agent)'
+    backrefs: true
+  when: keychain.found == 0
+  tags:
+    - zsh
+
