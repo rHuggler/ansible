@@ -58,6 +58,7 @@
   ansible.builtin.copy:
     src: "{{ lookup('env', 'HOME') }}/alacritty/target/release/alacritty"
     dest: "{{ lookup('env', 'HOME') }}/.local/bin/alacritty"
+    mode: a+x
   tags:
     - alacritty
 
