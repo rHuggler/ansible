@@ -14,3 +14,5 @@
     - import_tasks: tasks/node.yml
     - import_tasks: tasks/docker.yml
       become: true
+    - import_tasks: tasks/spotify.yml
+      become: true
