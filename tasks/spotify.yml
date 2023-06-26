@@ -6,7 +6,7 @@
     - spotify
 
 - name: Install Spotify GPG key
-  shell: curl -sS https://download.spotify.com/debian/pubkey_7A3A762FAFD4A51F.gpg | sudo gpg --dearmor --yes -o /etc/apt/trusted.gpg.d/spotify.gpg
+  shell: curl -sS https://download.spotify.com/debian/pubkey_7A3A762FAFD4A51F.gpg | gpg --dearmor --yes -o /etc/apt/trusted.gpg.d/spotify.gpg
   when: spotify_gpg.stat.exists == False
   tags:
     - spotify
@@ -19,7 +19,7 @@
     - spotify
 
 - name: Add Spotify repository
-  shell: echo "deb http://repository.spotify.com stable non-free" | sudo tee /etc/apt/sources.list.d/spotify.list
+  shell: echo "deb http://repository.spotify.com stable non-free" | tee /etc/apt/sources.list.d/spotify.list
   when: spotify_list.stat.exists == False
   tags:
     - spotify
@@ -27,7 +27,7 @@
 - name: Install Spotify client
   apt:
     name: spotify-client
-    state: present
+    state: latest
     update_cache: true
   tags:
     - spotify

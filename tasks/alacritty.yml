@@ -21,18 +21,8 @@
 
 - name: Install build dependencies
   apt:
-    name: "{{ item }}"
+    name: ["cmake", "pkg-config", "libfreetype6-dev", "libfontconfig1-dev", "libxcb-xfixes0-dev", "libxkbcommon-dev", "python3", "gzip", "scdoc", ]
     state: latest
-  with_items:
-    - cmake 
-    - pkg-config 
-    - libfreetype6-dev 
-    - libfontconfig1-dev 
-    - libxcb-xfixes0-dev 
-    - libxkbcommon-dev 
-    - python3
-    - gzip
-    - scdoc
   become: true
   tags:
     - alacritty

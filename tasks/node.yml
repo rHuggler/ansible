@@ -1,6 +1,7 @@
 - name: Install Node
   apt:
     name: ['nodejs', 'npm']
+    state: latest
   become: true
   tags:
     - node
