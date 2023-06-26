@@ -32,3 +32,11 @@
   tags:
     - core
 
+- name: Install more packages
+  apt:
+    name: ["rofi", "playerctl", "tree", "picom"]
+    state: latest
+  become: true
+  tags:
+    - core
+

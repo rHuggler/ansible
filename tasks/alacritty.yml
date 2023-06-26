@@ -170,3 +170,10 @@
   tags:
     - alacritty
 
+- name: Clone alacritty themes
+  ansible.builtin.git:
+    repo: 'https://github.com/alacritty/alacritty-theme'
+    dest: "{{ lookup('env', 'HOME') }}/.config/alacritty/themes"
+  tags:
+    - alacritty
+
