@@ -46,3 +46,12 @@
   tags:
     - core
 
+- name: Install backports polybar
+  apt:
+    name: polybar
+    state: latest
+    default_release: "$(lsb_release -cs)-backports"
+  become: true
+  tags:
+    - core
+
