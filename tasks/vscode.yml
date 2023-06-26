@@ -7,7 +7,7 @@
 
 - name: Install dependencies
   apt:
-    name: ["wget", "gpg"]
+    name: ["wget", "gpg", "apt-transport-https"]
     state: present
   become: true
   tags:
@@ -46,6 +46,7 @@
   apt:
     name: code
     state: latest
+    update_cache: true
   become: true
   tags:
     - vscode
