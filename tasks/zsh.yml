@@ -68,9 +68,3 @@
   tags:
     - zsh
 
-- name: Install xterm
-  apt:
-    name: xterm
-    state: latest
-  become: true
-
