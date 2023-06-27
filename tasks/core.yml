@@ -60,4 +60,21 @@
   become: true
   tags:
     - core
+    - polybar
+
+- name: Install python-dbus (polybar-spotify dependency)
+  ansible.builtin.pip:
+    name: dbus-python
+    executable: pip3
+  tags:
+    - core
+    - polybar
+
+- name: Install polybar-spotify
+  ansible.builtin.git:
+    repo: https://github.com/Jvanrhijn/polybar-spotify
+    dest: "{{ lookup('env', 'HOME') }}/.config/polybar/scripts"
+  tags:
+    - core
+    - polybar
 
