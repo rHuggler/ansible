@@ -79,3 +79,38 @@
     - polybar
     - polybar-spotify
 
+- name: Download GTK Nordic theme
+  ansible.builtin.get_url:
+    url: https://github.com/EliverLara/Nordic/releases/download/v2.2.0/Nordic-bluish-accent-v40.tar.xz
+    dest: "{{ lookup('env', 'HOME') }}/.nordic.tar.xz"
+  tags:
+    - core
+    - theme
+
+- name: Create Nordic theme folder
+  ansible.builtin.file:
+    path: /usr/share/themes/Nordic
+    state: directory
+  become: true
+  tags:
+    - core
+    - theme
+
+- name: Extract ~/.nordic.tar.xz to /usr/share/themes
+  ansible.builtin.unarchive:
+    src: "{{ lookup('env', 'HOME') }}/.nordic.tar.xz"
+    dest: /usr/share/themes/Nordic
+    extra_opts:
+      - --strip-components
+      - 1
+  become: true
+  tags:
+    - core
+    - theme
+
+- name: Set gnome theme to Nordic
+  shell: "gsettings set org.gnome.desktop.interface gtk-theme Nordic && gsettings set org.gnome.desktop.wm.preferences theme Nordic && rm {{ lookup('env', 'HOME') }}/.nordic.tar.xz"
+  tags:
+    - core
+    - theme
+
