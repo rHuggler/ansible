@@ -41,7 +41,13 @@
     - core
 
 - name: Disable fn lock
-  shell: echo 2 | tee /sys/module/hid_apple/parameters/fnmode
+  shell: echo options hid_apple fnmode=2 | tee -a /etc/modprobe.d/hid_apple.conf
+  become: true
+  tags:
+    - core
+
+- name: Commit fn lock changes to initramfs
+  shell: update-initramfs -u -k all
   become: true
   tags:
     - core
