@@ -73,8 +73,9 @@
 - name: Install polybar-spotify
   ansible.builtin.git:
     repo: https://github.com/Jvanrhijn/polybar-spotify
-    dest: "{{ lookup('env', 'HOME') }}/.config/polybar/scripts"
+    dest: "{{ lookup('env', 'HOME') }}/.config/polybar/scripts/polybar-spotify"
   tags:
     - core
     - polybar
+    - polybar-spotify
 
