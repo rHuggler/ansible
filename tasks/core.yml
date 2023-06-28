@@ -77,7 +77,6 @@
   tags:
     - core
     - polybar
-    - polybar-spotify
 
 - name: Download GTK Nordic theme
   ansible.builtin.get_url:
@@ -113,4 +112,40 @@
   tags:
     - core
     - theme
+
+- name: Clone i3lock-fancy-rapid
+  ansible.builtin.git:
+    repo: https://github.com/yvbbrjdr/i3lock-fancy-rapid
+    dest: "{{ lookup('env', 'HOME') }}/.i3lock-fancy-rapid"
+  tags:
+    - i3lock
+
+- name: Install i3lock-fancy-rapid build dependencies
+  apt:
+    name: [ 'libx11-dev', 'i3lock' ]
+    state: latest
+  become: true
+  tags:
+    - i3lock
+
+- name: Make i3lock-fancy-rapid
+  community.general.make:
+    chdir: "{{ lookup('env', 'HOME') }}/.i3lock-fancy-rapid"
+  tags:
+    - i3lock
+
+- name: Copy i3lock-fancy-rapid binary to ~/.local/bin
+  ansible.builtin.copy:
+    src: "{{ lookup('env', 'HOME') }}/.i3lock-fancy-rapid/i3lock-fancy-rapid"
+    dest: "{{ lookup('env', 'HOME') }}/.local/bin/i3lock-fancy-rapid"
+    mode: a+x
+  tags:
+    - i3lock
+
+- name: Cleanup i3lock-fancy-rapid source code
+  ansible.builtin.file:
+    path: "{{ lookup('env', 'HOME') }}/.i3lock-fancy-rapid"
+    state: absent
+  tags:
+    - i3lock
 
