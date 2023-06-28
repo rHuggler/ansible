@@ -9,6 +9,7 @@
         - node
         - core
         - alacritty
+        - nvim
   tasks:
     - import_tasks: tasks/zsh.yml
     - import_tasks: tasks/core.yml
@@ -21,4 +22,5 @@
     - import_tasks: tasks/discord.yml
     - import_tasks: tasks/vscode.yml
     - import_tasks: tasks/ssh.yml
+    - import_tasks: tasks/nvim.yml
 
