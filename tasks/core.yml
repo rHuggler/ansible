@@ -34,7 +34,7 @@
 
 - name: Install more packages
   apt:
-    name: ["rofi", "playerctl", "tree", "picom", "stow", "keychain"]
+    name: ["rofi", "playerctl", "tree", "picom", "stow", "keychain", "yad", "xdotool"]
     state: latest
   become: true
   tags:
@@ -148,4 +148,22 @@
     state: absent
   tags:
     - i3lock
+
+- name: Install even more packages
+  apt:
+    name: ["bat", "ripgrep"]
+    state: latest
+  become: true
+  tags:
+    - core
+    - bat
+
+- name: Symlink bat to batcat
+  ansible.builtin.file:
+    src: "/usr/bin/batcat"
+    dest: "{{ lookup('env', 'HOME') }}/.local/bin/bat"
+    state: link
+  tags:
+    - core
+    - bat
 
