@@ -14,7 +14,6 @@
     mode: 0600
   with_items:
     - github_rhuggler
-    - github_rhuggler-cr
   tags:
     - dotfiles
     - ssh
@@ -26,7 +25,6 @@
     mode: 0644
   with_items:
     - github_rhuggler
-    - github_rhuggler-cr
   tags:
     - dotfiles
     - ssh
