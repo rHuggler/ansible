@@ -23,4 +23,5 @@
     - import_tasks: tasks/vscode.yml
     - import_tasks: tasks/ssh.yml
     - import_tasks: tasks/nvim.yml
+    - import_tasks: tasks/postman.yml
 

@@ -1,0 +1,32 @@
+- name: Create ~/postman directory
+  ansible.builtin.file:
+    path: "{{ lookup('env', 'HOME') }}/postman"
+    state: directory
+  tags:
+    - postman
+
+- name: Download and install Postman
+  ansible.builtin.get_url:
+    url: https://dl.pstmn.io/download/latest/linux_64
+    dest: "{{ lookup('env', 'HOME') }}/postman/postman.tar.gz"
+  tags:
+    - postman
+
+- name: Extract postman.tar.gz
+  ansible.builtin.unarchive:
+    src: "{{ lookup('env', 'HOME') }}/postman/postman.tar.gz"
+    dest: "{{ lookup('env', 'HOME') }}/postman"
+    extra_opts:
+      - --strip-components
+      - 1
+  tags:
+    - postman
+
+- name: Symlink postman to Postman
+  ansible.builtin.file:
+    path: "{{ lookup('env', 'HOME') }}/postman/Postman"
+    dest: "{{ lookup('env', 'HOME') }}/.local/bin/postman"
+    state: link
+  tags:
+    - postman
+
