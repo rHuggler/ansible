@@ -1,0 +1,13 @@
+- name: Add git repository from PPA
+  ansible.builtin.apt_repository:
+    repo: 'ppa:git-core/ppa'
+  tags:
+    - git
+
+- name: Upgrade git
+  apt:
+    name: git
+    state: latest
+    update_cache: true
+  tags:
+    - git
