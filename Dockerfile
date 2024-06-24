@@ -20,6 +20,5 @@ WORKDIR /home/huggler
 
 FROM huggler
 ARG TAGS
-COPY . .
-CMD ["sh", "-c", "ansible-playbook $TAGS setup.yml"]
-
+COPY --chown=huggler:huggler . ansible/
+CMD ["sh", "-c", "ansible-playbook $TAGS ansible/setup.yml"]

@@ -5,23 +5,11 @@
         update_cache: true
       become: true
       tags:
-        - zsh
-        - node
-        - core
-        - alacritty
-        - nvim
+        - dotfiles
+        - bat
   tasks:
-    - import_tasks: tasks/zsh.yml
-    - import_tasks: tasks/core.yml
-    - import_tasks: tasks/node.yml
-    - import_tasks: tasks/alacritty.yml
+    - import_tasks: tasks/dotfiles.yml
+    - import_tasks: tasks/ssh.yml
+    - import_tasks: tasks/bat.yml
     - import_tasks: tasks/docker.yml
       become: true
-    - import_tasks: tasks/spotify.yml
-      become: true
-    - import_tasks: tasks/discord.yml
-    - import_tasks: tasks/vscode.yml
-    - import_tasks: tasks/ssh.yml
-    - import_tasks: tasks/nvim.yml
-    - import_tasks: tasks/postman.yml
-

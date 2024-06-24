@@ -1,0 +1,38 @@
+- name: Install stow
+  apt:
+    name: stow
+    state: latest
+  become: true
+  tags:
+    - dotfiles
+    - ssh
+
+- name: Check if .dotfiles exists
+  stat:
+    path: "{{ lookup('env', 'HOME') }}/.dotfiles"
+  register: dotfiles
+  tags:
+    - dotfiles
+    - ssh
+
+- name: Clone .dotfiles
+  ansible.builtin.git:
+    repo: https://github.com/rHuggler/.dotfiles
+    dest: "{{ lookup('env', 'HOME') }}/.dotfiles"
+  when: dotfiles.stat.exists == False
+  tags:
+    - dotfiles
+    - ssh
+
+- name: Stow dotfiles
+  shell:
+    cmd: "stow {{ item }} --verbose=2"
+    chdir: "{{ lookup('env', 'HOME') }}/.dotfiles"
+  with_items:
+    - ssh
+    - git
+  register: result
+  changed_when: 'result.stderr is search("LINK")'
+  tags:
+    - dotfiles
+    - ssh

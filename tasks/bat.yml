@@ -1,0 +1,21 @@
+- name: Install batcat
+  apt:
+    name: bat
+    state: latest
+  become: true
+  tags:
+    - bat
+
+- name: Ensures {{ lookup('env', 'HOME') }}/.local/bin/ directory exists
+  ansible.builtin.file:
+    path: "{{ lookup('env', 'HOME') }}/.local/bin/"
+    state: directory
+    recurse: yes
+
+- name: Symlink bat to batcat
+  ansible.builtin.file:
+    src: "/usr/bin/batcat"
+    dest: "{{ lookup('env', 'HOME') }}/.local/bin/bat"
+    state: link
+  tags:
+    - bat

@@ -34,10 +34,10 @@
     state: absent
   with_items:
     - docker.io
-    - docker-doc 
-    - docker-compose 
-    - podman-docker 
-    - containerd 
+    - docker-doc
+    - docker-compose
+    - podman-docker
+    - containerd
     - runc
   tags:
     - docker
@@ -96,4 +96,3 @@
     enabled: true
   tags:
     - docker
-
