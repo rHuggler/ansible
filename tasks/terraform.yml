@@ -1,0 +1,59 @@
+- name: Create keyring
+  shell: install -m 0755 -d /etc/apt/keyrings
+  tags:
+    - terraform
+
+- name: Check if hashicorp-archive-keyring.gpg is installed
+  stat:
+    path: /etc/apt/keyrings/hashicorp-archive-keyring.gpg
+  register: hashicorpgpg
+  tags:
+    - terraform
+
+- name: Check if wget is installed
+  stat:
+    path: /usr/bin/wget
+  register: wget
+  tags:
+    - terraform
+
+- name: Install wget
+  apt:
+    name: wget
+    state: present
+    update_cache: true
+  when: 'wget.stat.exists == False'
+  tags:
+    - terraform
+
+- name: Add Hashicorp GPG Key to keyring
+  shell: wget -q -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor -o /etc/apt/keyrings/hashicorp-archive-keyring.gpg
+  when: 'hashicorpgpg.stat.exists == False'
+  tags:
+    - terraform
+
+- name: Set permissions
+  ansible.builtin.file:
+    path: /etc/apt/keyrings/hashicorp-archive-keyring.gpg
+    mode: a+r
+  tags:
+    - terraform
+
+
+- name: Add Terraform repository
+  shell: 'echo "deb [signed-by=/etc/apt/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/hashicorp.list > /dev/null'
+  tags:
+    - terraform
+
+- name: Install Terraform
+  apt:
+    name: terraform
+    state: latest
+    update_cache: true
+  tags:
+    - terraform
+
+- name: Install Terraform autocomplete
+  shell: terraform -install-autocomplete
+  tags:
+    - terraform

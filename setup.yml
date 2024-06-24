@@ -7,6 +7,8 @@
       tags:
         - dotfiles
         - bat
+        - fzf
+        - tmux
   tasks:
     - import_tasks: tasks/dotfiles.yml
     - import_tasks: tasks/ssh.yml
@@ -14,4 +16,9 @@
     - import_tasks: tasks/docker.yml
       become: true
     - import_tasks: tasks/git.yml
+      become: true
+    - import_tasks: tasks/fzf.yml
+    - import_tasks: tasks/tmux.yml
+    - import_tasks: tasks/asdf.yml
+    - import_tasks: tasks/terraform.yml
       become: true

@@ -2,7 +2,6 @@
   apt:
     name: stow
     state: latest
-  become: true
   tags:
     - dotfiles
     - ssh
