@@ -9,6 +9,7 @@
         - bat
         - fzf
         - tmux
+        - python
   tasks:
     - import_tasks: tasks/dotfiles.yml
     - import_tasks: tasks/ssh.yml
@@ -22,3 +23,9 @@
     - import_tasks: tasks/asdf.yml
     - import_tasks: tasks/terraform.yml
       become: true
+
+- name: Include node playbook
+  ansible.builtin.import_playbook: playbooks/node.yml
+
+- name: Include python playbook
+  ansible.builtin.import_playbook: playbooks/python.yml

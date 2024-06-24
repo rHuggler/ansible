@@ -1,0 +1,29 @@
+- hosts: localhost
+  environment:
+    PATH: "{{ lookup('env', 'PATH') }}:{{ lookup('env', 'HOME') }}/.asdf/bin/"
+
+  tasks:
+    - name:  Check if asdf exists
+      stat:
+        path: "{{ lookup('env', 'HOME') }}/.asdf/bin/asdf"
+      register: asdf
+      tags:
+        - node
+
+    - name: Add nodejs plugin
+      shell: asdf plugin add nodejs
+      when: asdf.stat.exists == True
+      tags:
+        - node
+
+    - name: Install nodejs:latest
+      shell: asdf install nodejs latest
+      when: asdf.stat.exists == True
+      tags:
+        - node
+
+    - name: Set global nodejs to latest
+      shell: asdf global nodejs latest
+      when: asdf.stat.exists == True
+      tags:
+        - node

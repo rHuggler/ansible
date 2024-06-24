@@ -1,0 +1,54 @@
+- hosts: localhost
+  environment:
+    PATH: "{{ lookup('env', 'PATH') }}:{{ lookup('env', 'HOME') }}/.asdf/bin/"
+
+  tasks:
+    - name:  Check if asdf exists
+      stat:
+        path: "{{ lookup('env', 'HOME') }}/.asdf/bin/asdf"
+      register: asdf
+      tags:
+        - python
+
+    - name: Install dependencies
+      apt:
+        name: "{{ item }}"
+        state: present
+        update_cache: true
+      become: true
+      with_items:
+        - build-essential
+        - libssl-dev
+        - zlib1g-dev
+        - libbz2-dev
+        - libreadline-dev
+        - libsqlite3-dev
+        - curl
+        - git
+        - libncursesw5-dev
+        - xz-utils
+        - tk-dev
+        - libxml2-dev
+        - libxmlsec1-dev
+        - libffi-dev
+        - liblzma-dev
+      tags:
+        - python
+
+    - name: Add python plugin
+      shell: asdf plugin add python
+      when: asdf.stat.exists == True
+      tags:
+        - python
+
+    - name: Install python:latest
+      shell: asdf install python latest
+      when: asdf.stat.exists == True
+      tags:
+        - python
+
+    - name: Set global python to latest
+      shell: asdf global python latest
+      when: asdf.stat.exists == True
+      tags:
+        - python
