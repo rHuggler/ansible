@@ -1,0 +1,100 @@
+- name: Install core packages
+  apt:
+    name: ["curl", "htop", "gnupg2", "pipewire", "wireplumber", "pipewire-pulse", "vim", "xclip"]
+    state: latest
+  become: true
+  tags:
+    - core
+
+- name: Disable pulseaudio.service
+  ansible.builtin.systemd:
+    name: "pulseaudio.service"
+    enabled: false
+  tags:
+    - core
+  ignore_errors: true
+
+- name: Disable pulseaudio.socket
+  ansible.builtin.systemd:
+    name: "pulseaudio.socket"
+    enabled: false
+  tags:
+    - core
+  ignore_errors: true
+
+- name: Mask pulseaudio
+  ansible.builtin.systemd:
+    name: pulseaudio
+    masked: true
+  tags:
+    - core
+  ignore_errors: true
+
+- name: Enable pipewire
+  ansible.builtin.systemd:
+    name: ["pipewire", "pipewire-pulse", "wireplumber"]
+    enabled: true
+  tags:
+    - core
+  ignore_errors: true
+
+- name: Disable power saving in kernel
+  shell: 'echo "options snd_hda_intel power_save=0" | sudo tee /etc/modprobe.d/snd-hda-intel.conf > /dev/null'
+  tags:
+    - core
+
+- name: Install more packages
+  apt:
+    name: ["playerctl", "tree", "xdotool"]
+    state: latest
+  become: true
+  tags:
+    - core
+
+- name: Disable fn lock
+  shell: echo options hid_apple fnmode=2 | tee -a /etc/modprobe.d/hid_apple.conf
+  become: true
+  tags:
+    - core
+
+- name: Commit fn lock changes to initramfs
+  shell: update-initramfs -u -k all
+  become: true
+  tags:
+    - core
+
+- name: Download GTK Nordic theme
+  ansible.builtin.get_url:
+    url: https://github.com/EliverLara/Nordic/releases/download/v2.2.0/Nordic-bluish-accent-v40.tar.xz
+    dest: "{{ lookup('env', 'HOME') }}/.nordic.tar.xz"
+  tags:
+    - core
+    - theme
+
+- name: Create Nordic theme folder
+  ansible.builtin.file:
+    path: /usr/share/themes/Nordic
+    state: directory
+  become: true
+  tags:
+    - core
+    - theme
+
+- name: Extract ~/.nordic.tar.xz to /usr/share/themes
+  ansible.builtin.unarchive:
+    src: "{{ lookup('env', 'HOME') }}/.nordic.tar.xz"
+    dest: /usr/share/themes/Nordic
+    extra_opts:
+      - --strip-components
+      - 1
+  become: true
+  tags:
+    - core
+    - theme
+
+- name: Set gnome theme to Nordic
+  shell: "gsettings set org.gnome.desktop.interface gtk-theme Nordic && gsettings set org.gnome.desktop.wm.preferences theme Nordic && rm {{ lookup('env', 'HOME') }}/.nordic.tar.xz"
+  tags:
+    - core
+    - theme
+

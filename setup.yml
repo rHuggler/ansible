@@ -10,9 +10,15 @@
         - fzf
         - tmux
         - python
+        - core
+        - vscode
+        - alacritty
   tasks:
+    - import_tasks: tasks/core.yml
+      become: true
     - import_tasks: tasks/dotfiles.yml
     - import_tasks: tasks/ssh.yml
+    - import_tasks: tasks/gpg.yml
     - import_tasks: tasks/bat.yml
     - import_tasks: tasks/docker.yml
       become: true
@@ -23,6 +29,9 @@
     - import_tasks: tasks/asdf.yml
     - import_tasks: tasks/terraform.yml
       become: true
+    - import_tasks: tasks/vscode.yml
+      become: true
+    - import_tasks: tasks/alacritty.yml
 
 - name: Include node playbook
   ansible.builtin.import_playbook: playbooks/node.yml

@@ -1,0 +1,18 @@
+- name: Ensure ~/.gpg directory exists
+  file:
+    dest: "{{ lookup('env', 'HOME') }}/.gpg"
+    mode: 0700
+    state: directory
+  tags:
+    - gpg
+
+- name: Install gpg key
+  copy:
+    src: "{{ playbook_dir }}/.gpg/{{ item }}"
+    dest: "{{ lookup('env', 'HOME') }}/.gpg/{{ item }}"
+    mode: 0600
+  with_items:
+    - github.gpg
+  tags:
+    - gpg
+
